@@ -11,6 +11,7 @@ EXAMPLES = [
   "Travel from Boon Lay to Little India during peak hours",
   "Travel from Boon Lay to Little India during night hours",
   "Travel from Boon Lay to Little India during nonpeak hours",
+  "Travel from Boon Lay to Little India during 2019-04-30T06:28 hours",
 ]
 
 # peak 6am-9am and 6pm-9pm Mon-Fri
@@ -34,12 +35,12 @@ CHANGE_LANE_TIME = 2
 
 # Assuming inclusive intervals
 TIME_CONFIG = {
-  ( (time(6,0), time(8, 59, 59) ), (MONDAY, FRIDAY) ) : PEAK,
-  ( (time(18,0), time(20, 59, 59) ), (MONDAY, FRIDAY) ) : PEAK,
+  ( (time(0,0), time(6, 0) ), (MONDAY, SUNDAY) ) : NIGHT,
+  ( (time(6,0), time(9, 0) ), (MONDAY, FRIDAY) ) : PEAK,
+  ( (time(18,0), time(21, 0) ), (MONDAY, FRIDAY) ) : PEAK,
   ( (time(20,0), time(23, 59, 59) ), (MONDAY, SUNDAY) ) : NIGHT,
-  ( (time(0,0), time(5, 59, 59) ), (MONDAY, SUNDAY) ) : NIGHT,
-  "default" : NONPEAK,
 }
+#  "default" : NONPEAK,
 
 WEIGHT_CONFIG = {
   PEAK: {

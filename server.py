@@ -32,8 +32,8 @@ class QueryForm(Form):
           flash([query] + path)
         except Exception as e:
           flash([query] + ['Error: %s' % str(e)])
-    else:
-      flash(['Error: All the fields are required.'])
+      else:
+        flash(['Error: All the fields are required.'])
 
     return render_template('route.html', form=form, examples=config.EXAMPLES)
 

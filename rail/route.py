@@ -2,6 +2,7 @@
 
 import re
 import pprint
+import dateparser
 
 import config
 from rail.parser import FileLoader
@@ -19,8 +20,18 @@ class Route(object):
     _from, _to = None, None
     if stations:
       (_from, _to, scorer), = stations
-      scorer = getattr(config, scorer.upper(), config.DISTANCE)
-      print ("Scorer: %s" % scorer)
+      _scorer = getattr(config, scorer.upper(), None)
+      if _scorer is None:
+        travel_time = dateparser.parse(scorer)
+        if travel_time is not None:
+          for (((start_time, end_time), (start_day, end_day)), _scorer) in config.TIME_CONFIG.items():
+            if start_time <= travel_time.time() < end_time and start_day <= travel_time.weekday() <= end_day:
+              scorer = _scorer
+              break
+          else:
+            scorer = config.NONPEAK
+      else:
+        scorer = _scorer
     else:
       stations = re.findall("Travel from (.+?) to (.+?)$", request)
       if stations: (_from, _to), = stations 
@@ -47,7 +58,7 @@ class Route(object):
     weight = None
     if scorer == config.DISTANCE:
       weight = node.default_weights.distance
-    else:
+    else:      
       if scorer == config.PEAK:
         weight = 'peak_weights'
       elif scorer == config.NONPEAK:
@@ -56,7 +67,7 @@ class Route(object):
         weight = 'night_weights'
       else:
         raise Exception("Invalid scorer")
-
+      
       if is_line_change:
         weight = getattr(node, weight).change_line
       else:
@@ -131,6 +142,7 @@ class Route(object):
 
     output = []
     output.append("Stations Travelled: %s" % (len(stations) - 1))
+    output.append("Scorer : %s" % (scorer))
     output.append("Stations: %s" % str(tuple(stations)) )
     if scorer != config.DISTANCE:
       output.append("Time Taken: %s minutes" % time_taken)
